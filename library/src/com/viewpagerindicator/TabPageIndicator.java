@@ -17,6 +17,7 @@
 package com.viewpagerindicator;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -25,7 +26,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import com.topface.topface.ui.views.IllustratedTextView;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -35,6 +38,7 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  * across different configurations or circumstances.
  */
 public class TabPageIndicator extends HorizontalScrollView implements PageIndicator {
+    public static final String DEFAULT_SUPERSKILLS_COLOR = "#f998ff";
     /** Title text used when no title is provided by the adapter. */
     private static final CharSequence EMPTY_TITLE = "";
 
@@ -83,7 +87,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         setHorizontalScrollBarEnabled(false);
 
         mTabLayout = new IcsLinearLayout(context, R.attr.vpiTabPageIndicatorStyle);
-        addView(mTabLayout, new ViewGroup.LayoutParams(WRAP_CONTENT, MATCH_PARENT));
+        addView(mTabLayout, new ViewGroup.LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
     }
 
     public void setOnTabReselectedListener(OnTabReselectedListener listener) {
@@ -155,12 +159,19 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         tabView.setFocusable(true);
         tabView.setOnClickListener(mTabClickListener);
         tabView.setText(text);
+        double density = getResources().getDisplayMetrics().density;
+        if(text.equals(getResources().getString(R.string.profile_vip_status))) {
+            tabView.setTextColor(Color.parseColor(DEFAULT_SUPERSKILLS_COLOR));
 
+            tabView.setPadding(0, (int)(5 * density), 0, (int)(10 * density));
+        } else {
+            tabView.setPadding((int)(20 * density), (int)(8 * density), (int) (20 * density), (int)(10*density));
+        }
         if (iconResId != 0) {
             tabView.setCompoundDrawablesWithIntrinsicBounds(iconResId, 0, 0, 0);
         }
 
-        mTabLayout.addView(tabView, new LinearLayout.LayoutParams(0, MATCH_PARENT, 1));
+        mTabLayout.addView(tabView, new LinearLayout.LayoutParams(WRAP_CONTENT, MATCH_PARENT, 1));
     }
 
     @Override
@@ -176,6 +187,8 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
             mListener.onPageScrolled(arg0, arg1, arg2);
         }
     }
+
+
 
     @Override
     public void onPageSelected(int arg0) {
@@ -258,7 +271,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         mListener = listener;
     }
 
-    private class TabView extends TextView {
+    private class TabView extends IllustratedTextView {
         private int mIndex;
 
         public TabView(Context context) {
