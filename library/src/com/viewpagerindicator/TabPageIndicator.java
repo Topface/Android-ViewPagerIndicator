@@ -28,7 +28,9 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.topface.topface.ui.views.IllustratedTextView;
+import com.topface.IllustratedTextView.IllustratedTextView;
+
+import java.util.regex.Pattern;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -160,7 +162,8 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         tabView.setOnClickListener(mTabClickListener);
         tabView.setText(text);
         double density = getResources().getDisplayMetrics().density;
-        if(text.equals(getResources().getString(R.string.profile_vip_status))) {
+        Pattern pattern = Pattern.compile(".*\\{\\{.*\\}\\}.*");
+        if(pattern.matcher(text).matches()) {
             tabView.setTextColor(Color.parseColor(DEFAULT_SUPERSKILLS_COLOR));
 
             tabView.setPadding(0, (int)(5 * density), 0, (int)(10 * density));
