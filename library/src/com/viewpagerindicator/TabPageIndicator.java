@@ -69,7 +69,6 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mListener;
 
-    private int mMaxTabWidth;
     private int mSelectedTabIndex;
 
     private OnTabReselectedListener mTabReselectedListener;
@@ -94,22 +93,25 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         final boolean lockedExpanded = widthMode == MeasureSpec.EXACTLY;
-        setFillViewport(lockedExpanded);
-
         final int childCount = mTabLayout.getChildCount();
-        if (childCount > 1 && (widthMode == MeasureSpec.EXACTLY || widthMode == MeasureSpec.AT_MOST)) {
-            if (childCount > 2) {
-                mMaxTabWidth = (int)(MeasureSpec.getSize(widthMeasureSpec) * 0.4f);
-            } else {
-                mMaxTabWidth = MeasureSpec.getSize(widthMeasureSpec) / 2;
-            }
-        } else {
-            mMaxTabWidth = -1;
-        }
 
         final int oldWidth = getMeasuredWidth();
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         final int newWidth = getMeasuredWidth();
+
+        int tabsWidth = 0;
+        for (int i = 0; i < childCount; i++) {
+            tabsWidth += mTabLayout.getChildAt(i).getMeasuredWidth();
+        }
+        if (tabsWidth <= newWidth) {
+            for (int i = 0; i < childCount; i++) {
+                View v = mTabLayout.getChildAt(i);
+                int topPad = v.getPaddingTop();
+                int bottomPad = v.getPaddingBottom();
+                mTabLayout.getChildAt(i).setPadding(0, topPad, 0, bottomPad);
+            }
+            setFillViewport(true);
+        }
 
         if (lockedExpanded && oldWidth != newWidth) {
             // Recenter the tab display if we're at a new (scrollable) size.
@@ -263,17 +265,6 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
 
         public TabView(Context context) {
             super(context, null, R.attr.vpiTabPageIndicatorStyle);
-        }
-
-        @Override
-        public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-
-            // Re-measure if we went beyond our maximum size.
-            if (mMaxTabWidth > 0 && getMeasuredWidth() > mMaxTabWidth) {
-                super.onMeasure(MeasureSpec.makeMeasureSpec(mMaxTabWidth, MeasureSpec.EXACTLY),
-                        heightMeasureSpec);
-            }
         }
 
         public int getIndex() {
